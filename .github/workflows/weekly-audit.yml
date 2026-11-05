@@ -1,0 +1,30 @@
+name: Auditoria semanal
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@1e60f620b9541d9e9b0b4c1a6b0a6b6b6f2b0e6
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Verificar vulnerabilidades altas ou críticas
+        run: npm audit --audit-level=high
+
+      - name: Validar build de produção
+        run: npm run build
